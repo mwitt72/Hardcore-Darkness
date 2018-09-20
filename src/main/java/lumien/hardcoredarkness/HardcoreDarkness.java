@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.util.concurrent.ListenableFutureTask;
@@ -45,7 +46,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = HardcoreDarkness.MOD_ID, name = HardcoreDarkness.MOD_NAME, version = HardcoreDarkness.MOD_VERSION)
+@Mod(modid = HardcoreDarkness.MOD_ID, name = HardcoreDarkness.MOD_NAME, version = HardcoreDarkness.MOD_VERSION, acceptedMinecraftVersions = "[1.12.2]")
 public class HardcoreDarkness
 {
 	public static final String MOD_ID = "hardcoredarkness";
@@ -69,7 +70,8 @@ public class HardcoreDarkness
 		configHandler = new ConfigHandler();
 		configHandler.preInit(event);
 
-		FMLCommonHandler.instance().bus().register(this);
+		MinecraftForge.EVENT_BUS.register(this);
+
 	}
 
 	@EventHandler
@@ -156,7 +158,7 @@ public class HardcoreDarkness
 
 							if (slider.options == GameSettings.Options.GAMMA)
 							{
-								row.buttonA = slider = new GuiOptionSlider(slider.id, slider.xPosition, slider.yPosition, GameSettings.Options.GAMMA, gammaOverride, gammaOverride)
+								row.buttonA = slider = new GuiOptionSlider(slider.id, slider.x, slider.y, GameSettings.Options.GAMMA, gammaOverride, gammaOverride)
 								{
 									@Override
 									public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
@@ -171,7 +173,7 @@ public class HardcoreDarkness
 									}
 								};
 
-								String s = I18n.format(GameSettings.Options.GAMMA.getEnumString(), new Object[0]) + ": ";
+								String s = I18n.format(GameSettings.Options.GAMMA.getTranslation(), new Object[0]) + ": ";
 								slider.sliderValue = gammaOverride;
 								slider.displayString = gammaOverride == 0.0F ? s + I18n.format("options.gamma.min", new Object[0]) : (gammaOverride == 1.0F ? s + I18n.format("options.gamma.max", new Object[0]) : s + "+" + (int) (gammaOverride * 100.0F) + "%");
 							}
@@ -183,7 +185,7 @@ public class HardcoreDarkness
 
 							if (slider.options == GameSettings.Options.GAMMA)
 							{
-								row.buttonB = slider = new GuiOptionSlider(slider.id, slider.xPosition, slider.yPosition, GameSettings.Options.GAMMA, gammaOverride, gammaOverride)
+								row.buttonB = slider = new GuiOptionSlider(slider.id, slider.x, slider.y, GameSettings.Options.GAMMA, gammaOverride, gammaOverride)
 								{
 									@Override
 									public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
@@ -198,7 +200,7 @@ public class HardcoreDarkness
 									}
 								};
 
-								String s = I18n.format(GameSettings.Options.GAMMA.getEnumString(), new Object[0]) + ": ";
+								String s = I18n.format(GameSettings.Options.GAMMA.getTranslation(), new Object[0]) + ": ";
 								slider.sliderValue = gammaOverride;
 								slider.displayString = gammaOverride == 0.0F ? s + I18n.format("options.gamma.min", new Object[0]) : (gammaOverride == 1.0F ? s + I18n.format("options.gamma.max", new Object[0]) : s + "+" + (int) (gammaOverride * 100.0F) + "%");
 							}

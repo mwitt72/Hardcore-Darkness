@@ -28,7 +28,7 @@ public class ConfigHandler
 		Configuration config = new Configuration(configFile);
 		config.load();
 
-		localConfig.setMode(config.get("Settings", "Mode", 0, "0: No minimum sky & block light, 1: No minimum block light, 2: Skylight is dependent on moon phase").getInt(0));
+		localConfig.setMode(config.get("Settings", "Mode", 2, "0: No minimum sky & block light, 1: No minimum block light, 2: Skylight is dependent on moon phase").getInt(0));
 		localConfig.setDarkNether(config.getBoolean("Dark Nether", "Settings", true, "Whether the Nether is also supposed to have its minimum light removed"));
 		localConfig.setDarkEnd(config.getBoolean("Dark End", "Settings", false, "Whether the End is also supposed to have its minimum light removed"));
 		localConfig.setAlternativeNightSkylight(config.getBoolean("AlternativeNightSkyLight", "Settings", false, "Switches the slightly bluish NightSkyLight in mode 1 & 2 with a more greenish version."));
