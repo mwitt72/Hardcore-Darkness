@@ -5,11 +5,7 @@ import static org.objectweb.asm.Opcodes.FLOAD;
 import static org.objectweb.asm.Opcodes.FMUL;
 import static org.objectweb.asm.Opcodes.FSTORE;
 
-import java.io.File;
-import java.util.Iterator;
-
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.common.config.Configuration;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -29,8 +25,6 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-
-import scala.actors.threadpool.Arrays;
 
 public class ClassTransformer implements IClassTransformer
 {
@@ -110,14 +104,18 @@ public class ClassTransformer implements IClassTransformer
 		logger.log(Level.DEBUG, "Found World Class: " + classNode.name);
 
 		String sunBrightnessName = "getSunBrightnessBody";
-
-		int removeIndex = 0;
+		String skylightSubtractedName = "calculateSkylightSubtracted";
 
 		MethodNode getSunBrightnessBody = null;
+		MethodNode calculateSkylightSubtracted = null;
 
 		for (MethodNode mn : classNode.methods)
 		{
-			if (mn.name.equals(sunBrightnessName))
+			if (mn.name.equals(skylightSubtractedName))
+			{
+				calculateSkylightSubtracted = mn;
+			}
+			else if (mn.name.equals(sunBrightnessName))
 			{
 				getSunBrightnessBody = mn;
 			}
@@ -137,17 +135,36 @@ public class ClassTransformer implements IClassTransformer
 				{
 					LdcInsnNode lin = (LdcInsnNode) an;
 
-					if (lin.cst.equals(mult))
+					if (!activate2Power && lin.cst.equals(add))
 					{
-						logger.log(Level.DEBUG, " - Patched minimal sky light (1/2)");
-						getSunBrightnessBody.instructions.set(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, "lumien/hardcoredarkness/handler/AsmHandler", "sky1", "()F", false));
+						logger.log(Level.DEBUG, " - Patching minimal sky light (1/4)");
+						getSunBrightnessBody.instructions.set(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, "lumien/hardcoredarkness/handler/AsmHandler", "sky3", "()F", false));
 						activate2Power = true;
+					}
+					else if (lin.cst.equals(mult))
+					{
+						logger.log(Level.DEBUG, " - Patching minimal sky light (2/4)");
+						getSunBrightnessBody.instructions.set(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, "lumien/hardcoredarkness/handler/AsmHandler", "sky1", "()F", false));
 					}
 					else if (activate2Power && lin.cst.equals(add))
 					{
-						logger.log(Level.DEBUG, " - Patched minimal sky light (2/2)");
+						logger.log(Level.DEBUG, " - Patching minimal sky light (3/4)");
 						getSunBrightnessBody.instructions.set(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, "lumien/hardcoredarkness/handler/AsmHandler", "sky2", "()F", false));
 					}
+				}
+			}
+		}
+
+		if (calculateSkylightSubtracted != null)
+		{
+			for (int i = 0; i < calculateSkylightSubtracted.instructions.size(); i++)
+			{
+				AbstractInsnNode an = calculateSkylightSubtracted.instructions.get(i);
+				if (an instanceof LdcInsnNode)
+				{
+					LdcInsnNode lin = (LdcInsnNode) an;
+					logger.log(Level.DEBUG, " - Patching minimal sky light (4/4)");
+					calculateSkylightSubtracted.instructions.set(lin, new MethodInsnNode(Opcodes.INVOKESTATIC, "lumien/hardcoredarkness/handler/AsmHandler", "sky4", "()F", false));
 				}
 			}
 		}

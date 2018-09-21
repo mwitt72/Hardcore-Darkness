@@ -4,7 +4,6 @@ import java.awt.Color;
 
 import lumien.hardcoredarkness.HardcoreDarkness;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.MobEffects;
 
 public class AsmHandler
@@ -39,8 +38,53 @@ public class AsmHandler
 		return true;
 	}
 
+	static float value1 = 0;
 	static float value2 = 0;
 	static int skyModeCache;
+
+	public static float sky4() {
+		if (!enabled()) {
+			return 11.0F;
+		}
+
+		skyModeCache = HardcoreDarkness.INSTANCE.getActiveConfig().getMode();
+
+		switch (skyModeCache)
+		{
+			case 0:
+				return 15.0F;
+			case 1:
+				return 11.0F;
+			case 2:
+				float[] lightList = HardcoreDarkness.INSTANCE.getActiveConfig().getMoonLightList();
+				float moon = Minecraft.getMinecraft().world.getCurrentMoonPhaseFactor();
+
+				value1 = lightList[(int) Math.round(moon / 0.25)];
+				value2 = 1 - value1;
+
+				return value1 * 15F;
+			default:
+				return 11.0F;
+		}
+	}
+
+	public static float sky3() {
+		if (!enabled()) {
+			return 0.2f;
+		}
+
+		switch (skyModeCache)
+		{
+			case 0:
+				return 0.5F;
+			case 1:
+				return 0.2F;
+			case 2:
+				return 0.5F;
+			default:
+				return 0.2F;
+		}
+	}
 
 	public static float sky1()
 	{
@@ -49,8 +93,6 @@ public class AsmHandler
 			return 0.8f;
 		}
 
-		skyModeCache = HardcoreDarkness.INSTANCE.getActiveConfig().getMode();
-
 		switch (skyModeCache)
 		{
 			case 0:
@@ -58,12 +100,7 @@ public class AsmHandler
 			case 1:
 				return 0.8F;
 			case 2:
-				float[] lightList = HardcoreDarkness.INSTANCE.getActiveConfig().getMoonLightList();
-				float moon = Minecraft.getMinecraft().world.getCurrentMoonPhaseFactor();
-				float value = lightList[(int) Math.round(moon / 0.25)];
-
-				value2 = 1 - value;
-				return value;
+				return value1;
 			default:
 				return 0.8F;
 		}
